@@ -1,0 +1,1 @@
+ros2 run ORB_SLAM3 RGBD Vocabulary/ORBvoc.txt PATH_TO_SETTINGS_FILE
