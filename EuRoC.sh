@@ -1,0 +1,2 @@
+./Examples/Stereo-Inertial/stereo_inertial_euroc Vocabulary/ORBvoc.txt Examples/Stereo-Inertial/EuRoC.yaml ./ Examples/Stereo-Inertial/EuRoC_TimeStamps/MH02.txt
+python evaluation/evaluate_ate_scale.py evaluation/Ground_truth/EuRoC_left_cam/MH02_GT.txt CameraTrajectory.txt
