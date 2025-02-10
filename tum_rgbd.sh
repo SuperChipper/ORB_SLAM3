@@ -24,11 +24,12 @@ run_orbslam3() {
     local settings_file=$4
 
     echo "Running ORB-SLAM3 on dataset $dataset_path..."
+    chmod +x ./Examples/RGB-D/rgbd_tum
     ./Examples/RGB-D/rgbd_tum \
-        $settings_file \
-        $dataset_path/associate.txt \
         $vocab_file \
-        $output_dir
+        $settings_file \
+        $dataset_path \
+        Examples/RGB-D/associations/$dataset_name.txt 
     echo "ORB-SLAM3 finished processing the dataset."
 }
 
@@ -53,12 +54,12 @@ datasets=(
     #["fr2_rpy"]="https://cvg.cit.tum.de/rgbd/dataset/freiburg2/rgbd_dataset_freiburg2_rpy.tgz"
     ["fr3_long_office_household"]="https://cvg.cit.tum.de/rgbd/dataset/freiburg3/rgbd_dataset_freiburg3_long_office_household.tgz"
     ["fr3_nostructure_notexture_far"]="https://cvg.cit.tum.de/rgbd/dataset/freiburg3/rgbd_dataset_freiburg3_nostructure_notexture_far.tgz"
-    ["fr3_nostructure_notexture_near_withloop"]="https://cvg.cit.tum.de/rgbd/dataset/freiburg3/rgbd_dataset_freiburg3_nostructure_notexture_near_withloop.tgz"
+    #["fr3_nostructure_notexture_near_withloop"]="https://cvg.cit.tum.de/rgbd/dataset/freiburg3/rgbd_dataset_freiburg3_nostructure_notexture_near_withloop.tgz"
     ["fr3_nostructure_texture_far"]="https://cvg.cit.tum.de/rgbd/dataset/freiburg3/rgbd_dataset_freiburg3_nostructure_texture_far.tgz"
-    ["fr3_nostructure_texture_near_withloop"]="https://cvg.cit.tum.de/rgbd/dataset/freiburg3/rgbd_dataset_freiburg3_nostructure_texture_near_withloop.tgz"
+    #["fr3_nostructure_texture_near_withloop"]="https://cvg.cit.tum.de/rgbd/dataset/freiburg3/rgbd_dataset_freiburg3_nostructure_texture_near_withloop.tgz"
 )
 
-VOCAB_FILE="Vocabulary/ORBvoc.bin"
+VOCAB_FILE="Vocabulary/ORBvoc.txt"
 OUTPUT_DIR="output"
 SETTINGS_FILE="Examples/RGB-D/TUM1.yaml"
 
@@ -77,7 +78,7 @@ for dataset_name in "${!datasets[@]}"; do
     # Define groundtruth and result files for evaluation
     GROUNDTRUTH_FILE="$DATASET_DIR/groundtruth.txt"
     
-    RESULTS_FILE="$OUTPUT_DIR/Trajectory_$dataset_name.txt"
+    RESULTS_FILE="CameraTrajectory.txt"
     touch $RESULTS_FILE
     # Evaluate the results
     evaluate_results $GROUNDTRUTH_FILE $RESULTS_FILE
