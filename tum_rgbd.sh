@@ -35,6 +35,11 @@ run_orbslam3() {
         "$settings_file" \
         "$dataset_path" \
         "Examples/RGB-D/associations/${dataset_name}.txt"
+    ./PRIOR-SLAM/Examples/RGB-D/rgbd_prior_tum_vi \
+        "$vocab_file" \
+        "$settings_file" \
+        "$dataset_path" \
+        "Examples/RGB-D/associations/${dataset_name}.txt"
     echo "ORB-SLAM3 finished processing the dataset."
 }
 
