@@ -127,6 +127,7 @@ ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 
 # If RealSense SDK is found the library is added and its examples compiled
 if(realsense2_FOUND)
+    message(STATUS "RealSense SDK found")
     include_directories(${PROJECT_NAME}
     ${realsense_INCLUDE_DIR}
     )
@@ -235,6 +236,20 @@ if(realsense2_FOUND)
             Examples/Monocular-Inertial/mono_inertial_realsense_D435i.cc)
     target_link_libraries(mono_inertial_realsense_D435i ${PROJECT_NAME})
 endif()
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/PRIOR-SLAM/Examples/Monocular)
+
+
+add_executable(mono_prior_tum_vi PRIOR-SLAM/Examples/Monocular/mono_tum_vi.cc)
+target_link_libraries(mono_prior_tum_vi ${PROJECT_NAME})
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/PRIOR-SLAM/Examples/RGB-D)
+
+
+add_executable(rgbd_prior_tum_vi PRIOR-SLAM/Examples/RGB-D/rgbd_tum.cc)
+target_link_libraries(rgbd_prior_tum_vi ${PROJECT_NAME})
+
+
 
 #Stereo Inertial examples
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/Stereo-Inertial)

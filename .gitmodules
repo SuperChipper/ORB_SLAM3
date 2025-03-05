@@ -1,0 +1,3 @@
+[submodule "PRIOR-SLAM"]
+	path = PRIOR-SLAM
+	url = https://github.com/wangyizhao/PRIOR-SLAM/tree/main
