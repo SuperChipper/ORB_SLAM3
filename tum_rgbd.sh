@@ -27,6 +27,7 @@ run_orbslam3() {
     local output_dir=$3
     local settings_file=$4
     local dataset_name=$5  # We pass the dataset name so we can use it below
+    local EVAL_RESULTS_FILE=$6
 
     echo "Running ORB-SLAM3 on dataset $dataset_path..."
     chmod +x ./Examples/RGB-D/rgbd_tum
@@ -35,26 +36,55 @@ run_orbslam3() {
         "$settings_file" \
         "$dataset_path" \
         "Examples/RGB-D/associations/${dataset_name}.txt"
+
+            # Evaluate
+    GROUNDTRUTH_FILE="$dataset_path/groundtruth.txt"
+    RESULTS_FILE="CameraTrajectory.txt"
+    # Ensure we have a results file
+    touch "$RESULTS_FILE"
+
+    # Append header for this dataset's evaluation results
+    echo "======================" | tee -a "$EVAL_RESULTS_FILE"
+    echo "Evaluation results for dataset: $dataset_name" | tee -a "$EVAL_RESULTS_FILE"
+    echo "----------------------" | tee -a "$EVAL_RESULTS_FILE"
+    evaluate_results "$GROUNDTRUTH_FILE" "$RESULTS_FILE" "$EVAL_RESULTS_FILE"
+    echo "======================" | tee -a "$EVAL_RESULTS_FILE"
+
     ./PRIOR-SLAM/Examples/RGB-D/rgbd_prior_tum_vi \
         "$vocab_file" \
         "$settings_file" \
         "$dataset_path" \
         "Examples/RGB-D/associations/${dataset_name}.txt"
+
+            # Evaluate
+    GROUNDTRUTH_FILE="$dataset_path/groundtruth.txt"
+    RESULTS_FILE="CameraTrajectory.txt"
+    # Ensure we have a results file
+    touch "$RESULTS_FILE"
+
+    # Append header for this dataset's evaluation results
+    echo "======================" | tee -a "$EVAL_RESULTS_FILE"
+    echo "Evaluation results for dataset: $dataset_name" | tee -a "$EVAL_RESULTS_FILE"
+    echo "----------------------" | tee -a "$EVAL_RESULTS_FILE"
+    evaluate_results "$GROUNDTRUTH_FILE" "$RESULTS_FILE" "$EVAL_RESULTS_FILE"
+    echo "======================" | tee -a "$EVAL_RESULTS_FILE"
+    
     echo "ORB-SLAM3 finished processing the dataset."
 }
 
 ###############################################################################
-# Function to evaluate results
+# Function to evaluate results and save them into a file
 ###############################################################################
 evaluate_results() {
     local groundtruth_file=$1
     local results_file=$2
+    local eval_file=$3
 
-    echo "Evaluating results..."
+    echo "Evaluating results..." | tee -a "$eval_file"
     python3 ./evaluation/evaluate_ate_scale.py \
         "$groundtruth_file" \
-        "$results_file"
-    echo "Evaluation complete!"
+        "$results_file" 2>&1 | tee -a "$eval_file"
+    echo "Evaluation complete!" | tee -a "$eval_file"
 }
 
 ###############################################################################
@@ -80,6 +110,10 @@ declare -A datasets=(
 VOCAB_FILE="Vocabulary/ORBvoc.txt"
 OUTPUT_DIR="output"
 SETTINGS_FILE="Examples/RGB-D/TUM1.yaml"
+EVAL_RESULTS_FILE="slam_eval_results.txt"
+
+# Clear the evaluation results file
+> "$EVAL_RESULTS_FILE"
 
 ###############################################################################
 # Main loop: Download, extract, run ORB-SLAM3, and evaluate
@@ -98,15 +132,9 @@ for dataset_name in "${!datasets[@]}"; do
     fi
 
     # 3. Run ORB-SLAM3
-    run_orbslam3 "$DATASET_DIR" "$VOCAB_FILE" "$OUTPUT_DIR" "$SETTINGS_FILE" "$dataset_name"
+    run_orbslam3 "$DATASET_DIR" "$VOCAB_FILE" "$OUTPUT_DIR" "$SETTINGS_FILE" "$dataset_name" "$EVAL_RESULTS_FILE"
 
-    # 4. Evaluate
-    GROUNDTRUTH_FILE="$DATASET_DIR/groundtruth.txt"
-    RESULTS_FILE="CameraTrajectory.txt"
-    # Ensure we have a results file
-    touch "$RESULTS_FILE"
 
-    evaluate_results "$GROUNDTRUTH_FILE" "$RESULTS_FILE"
 
     echo "--------------------------------------------------"
     echo "Done with dataset: $dataset_name"
