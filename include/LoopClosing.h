@@ -25,7 +25,7 @@
 #include "Atlas.h"
 #include "ORBVocabulary.h"
 #include "Tracking.h"
-
+#include "PointCloudMapping.h"
 #include "KeyFrameDatabase.h"
 
 #include <boost/algorithm/string.hpp>
@@ -40,7 +40,7 @@ class Tracking;
 class LocalMapping;
 class KeyFrameDatabase;
 class Map;
-
+class PointCloudMapping;
 
 class LoopClosing
 {
@@ -57,6 +57,11 @@ public:
     void SetTracker(Tracking* pTracker);
 
     void SetLocalMapper(LocalMapping* pLocalMapper);
+
+    void SetPointCloudMapper(PointCloudMapping* pPointCloudMapping)
+    {
+        mpPointCloudMapping = pPointCloudMapping;
+    }
 
     // Main function
     void Run();
@@ -182,7 +187,8 @@ protected:
     std::vector<MapPoint*> mvpLoopMapPoints;
     cv::Mat mScw;
     g2o::Sim3 mg2oScw;
-
+    PointCloudMapping* mpPointCloudMapping;
+    std::thread* mpThreadDML;
     //-------
     Map* mpLastMap;
 

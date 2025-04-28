@@ -1519,8 +1519,10 @@ Sophus::SE3f Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat 
 
 Sophus::SE3f Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const double &timestamp, string filename)
 {
+    mImLeft = imRGB.clone();
     mImGray = imRGB;
-    cv::Mat imDepth = imD;
+    mImDepth = imD.clone();
+    mImGray = imRGB;
 
     if(mImGray.channels()==3)
     {
@@ -1537,13 +1539,13 @@ Sophus::SE3f Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, co
             cvtColor(mImGray,mImGray,cv::COLOR_BGRA2GRAY);
     }
 
-    if((fabs(mDepthMapFactor-1.0f)>1e-5) || imDepth.type()!=CV_32F)
-        imDepth.convertTo(imDepth,CV_32F,mDepthMapFactor);
+    if((fabs(mDepthMapFactor-1.0f)>1e-5) || mImDepth.type()!=CV_32F)
+        mImDepth.convertTo(mImDepth,CV_32F,mDepthMapFactor);
 
     if (mSensor == System::RGBD)
-        mCurrentFrame = Frame(mImGray,imDepth,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth,mpCamera);
+        mCurrentFrame = Frame(mImGray,mImDepth,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth,mpCamera);
     else if(mSensor == System::IMU_RGBD)
-        mCurrentFrame = Frame(mImGray,imDepth,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth,mpCamera,&mLastFrame,*mpImuCalib);
+        mCurrentFrame = Frame(mImGray,mImDepth,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth,mpCamera,&mLastFrame,*mpImuCalib);
 
 
 
@@ -2618,6 +2620,12 @@ void Tracking::CreateInitialMapMonocular()
 
         mpImuPreintegratedFromLastKF = new IMU::Preintegrated(pKFcur->mpImuPreintegrated->GetUpdatedBias(),pKFcur->mImuCalib);
     }
+    if(mSensor==System::STEREO || mSensor==System::IMU_STEREO || mSensor==System::RGBD)
+    {
+        pKFcur->imLeftRgb = mImLeft.clone();
+        pKFcur->imRightRgb = mImRight.clone();
+        pKFcur->imDepth = mImDepth.clone();
+    }
 
 
     mpLocalMapper->InsertKeyFrame(pKFini);
@@ -2695,7 +2703,11 @@ void Tracking::CreateMapInAtlas()
     mLastFrame = Frame();
     mCurrentFrame = Frame();
     mvIniMatches.clear();
-
+    if(mSensor==System::STEREO || mSensor==System::IMU_STEREO || mSensor==System::RGBD)
+    {
+        if (mpPointCloudMapping)
+            mpPointCloudMapping->Clear();
+    }
     mbCreatedMap = true;
 }
 
@@ -3331,7 +3343,15 @@ void Tracking::CreateNewKeyFrame()
         }
     }
 
-
+    if(mSensor==System::STEREO || mSensor==System::IMU_STEREO || mSensor==System::RGBD)
+    {
+        // std::cout<<"mimLeft.empty()"<<mimLeft.empty()<<std::endl;
+        pKF->imLeftRgb = mImLeft.clone();
+        pKF->imRightRgb = mImRight.clone();
+        pKF->imDepth = mImDepth.clone();
+        // imshow("sss", pKF->imLeftRgb);
+        // cv::waitKey(1);
+    }
     mpLocalMapper->InsertKeyFrame(pKF);
 
     mpLocalMapper->SetNotStop(false);

@@ -52,7 +52,6 @@ class LocalMapping;
 class LoopClosing;
 class System;
 class Settings;
-
 class Tracking
 {  
 
@@ -96,6 +95,10 @@ public:
 
     void CreateMapInAtlas();
     //std::mutex mMutexTracks;
+    //PointCloudMapping pointer
+    void SetPointCloudMapper(PointCloudMapping* pPointCloudMapping){
+        mpPointCloudMapping = pPointCloudMapping;
+    }
 
     //--
     void NewDataset();
@@ -191,6 +194,8 @@ public:
     vector<double> vdNewKF_ms;
     vector<double> vdTrackTotal_ms;
 #endif
+    cv::Mat mImLeft, mImRight;
+    cv::Mat mImDepth;
 
 protected:
 
@@ -276,7 +281,7 @@ protected:
     
     // System
     System* mpSystem;
-    
+    PointCloudMapping* mpPointCloudMapping;
     //Drawers
     Viewer* mpViewer;
     FrameDrawer* mpFrameDrawer;
@@ -367,7 +372,6 @@ protected:
 #endif
 
 public:
-    cv::Mat mImRight;
 };
 
 } //namespace ORB_SLAM

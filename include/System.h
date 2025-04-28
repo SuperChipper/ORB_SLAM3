@@ -39,10 +39,12 @@
 #include "Viewer.h"
 #include "ImuTypes.h"
 #include "Settings.h"
-
-
+#include "PointCloudMapping.h"
 namespace ORB_SLAM3
 {
+
+// 前向声明PointCloudMapping类，避免循环引用
+class PointCloudMapping;
 
 class Verbose
 {
@@ -219,6 +221,8 @@ private:
 
     // Local Mapper. It manages the local map and performs local bundle adjustment.
     LocalMapping* mpLocalMapper;
+
+    PointCloudMapping* mpPointCloudMapping;
 
     // Loop Closer. It searches loops with every new keyframe. If there is a loop it performs
     // a pose graph optimization and full bundle adjustment (in a new thread) afterwards.

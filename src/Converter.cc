@@ -311,4 +311,11 @@ Sophus::Sim3f Converter::toSophus(const g2o::Sim3& S) {
                          S.translation().cast<float>());
 }
 
+Eigen::Matrix<double,4,4> Converter::toMatrix4d(const Sophus::SE3f &T) {
+    Eigen::Matrix<double,4,4> eigMat = Eigen::Matrix4d::Identity();
+    eigMat.block<3,3>(0,0) = T.rotationMatrix().cast<double>();
+    eigMat.block<3,1>(0,3) = T.translation().cast<double>();
+    return eigMat;
+}
+
 } //namespace ORB_SLAM

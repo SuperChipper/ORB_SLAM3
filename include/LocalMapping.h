@@ -26,6 +26,7 @@
 #include "Tracking.h"
 #include "KeyFrameDatabase.h"
 #include "Settings.h"
+#include "PointCloudMapping.h"
 
 #include <mutex>
 
@@ -37,7 +38,7 @@ class System;
 class Tracking;
 class LoopClosing;
 class Atlas;
-
+class PointCloudMapping;
 class LocalMapping
 {
 public:
@@ -47,6 +48,10 @@ public:
     void SetLoopCloser(LoopClosing* pLoopCloser);
 
     void SetTracker(Tracking* pTracker);
+
+    void SetPointCloudMapper(PointCloudMapping* pPointCloudMapper){
+        mpPointCloudMapping = pPointCloudMapper;
+    }
 
     // Main function
     void Run();
@@ -160,6 +165,10 @@ protected:
 
     LoopClosing* mpLoopCloser;
     Tracking* mpTracker;
+    
+    std::list<KeyFrame*> mlNewKeyFrameForDenseMap;
+    PointCloudMapping* mpPointCloudMapping;
+    thread* mpThreadDML;
 
     std::list<KeyFrame*> mlNewKeyFrames;
 

@@ -37,7 +37,8 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
-
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
 
 namespace ORB_SLAM3
 {
@@ -304,6 +305,8 @@ public:
     void SetKeyFrameDatabase(KeyFrameDatabase* pKFDB);
 
     bool bImu;
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr mptrPointCloud;
+    cv::Mat imLeftRgb, imRightRgb, imDepth;
 
     // The following variables are accesed from only 1 thread or never change (no mutex needed).
 public:

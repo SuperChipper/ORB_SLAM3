@@ -1190,6 +1190,9 @@ void LoopClosing::CorrectLoop()
 #endif
 
     mpAtlas->InformNewBigChange();
+    mpPointCloudMapping->mabIsUpdating = false;  // 强制让已有的更新停止，进行新的
+    mpThreadDML = new thread(&PointCloudMapping::updatecloud, mpPointCloudMapping, std::ref(*mpCurrentKF->GetMap()));
+    mpThreadDML->detach();
 
     // Add loop edge
     mpLoopMatchedKF->AddLoopEdge(mpCurrentKF);
@@ -1750,6 +1753,9 @@ void LoopClosing::MergeLocal()
         }
     }
 
+    mpPointCloudMapping->mabIsUpdating = false;  // 强制让已有的更新停止，进行新的
+    mpThreadDML = new thread(&PointCloudMapping::updatecloud, mpPointCloudMapping, std::ref(*pMergeMap));
+    mpThreadDML->detach();
 #ifdef REGISTER_TIMES
     std::chrono::steady_clock::time_point time_EndOptEss = std::chrono::steady_clock::now();
 
@@ -2502,6 +2508,9 @@ void LoopClosing::RunGlobalBundleAdjustment(Map* pActiveMap, unsigned long nLoop
             double timeFGBA = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndUpdateMap - time_StartFGBA).count();
             vdFGBATotal_ms.push_back(timeFGBA);
 #endif
+            mpPointCloudMapping->mabIsUpdating = false;  // 强制让已有的更新停止，进行新的
+            mpThreadDML = new thread(&PointCloudMapping::updatecloud, mpPointCloudMapping, std::ref(*pActiveMap));
+            mpThreadDML->detach();
             Verbose::PrintMess("Map updated!", Verbose::VERBOSITY_NORMAL);
         }
 

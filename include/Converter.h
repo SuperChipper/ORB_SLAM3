@@ -74,6 +74,9 @@ public:
     //TODO: Sophus migration, to be deleted in the future
     static Sophus::SE3<float> toSophus(const cv::Mat& T);
     static Sophus::Sim3f toSophus(const g2o::Sim3& S);
+
+    // 添加从Sophus::SE3f到Eigen::Matrix4d的转换函数
+    static Eigen::Matrix<double,4,4> toMatrix4d(const Sophus::SE3f &T);
 };
 
 }// namespace ORB_SLAM

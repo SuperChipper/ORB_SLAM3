@@ -98,3 +98,6 @@ output*
 dataset*
 .vscode*
 slam_eval_results.txt
+*.log
+*.pcd
+run/*

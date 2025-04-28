@@ -32,7 +32,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
-
+#include "PointCloudMapping.h"
 namespace ORB_SLAM3
 {
 
@@ -222,6 +222,19 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
     mpLoopCloser->SetTracker(mpTracker);
     mpLoopCloser->SetLocalMapper(mpLocalMapper);
+
+    if(mSensor==STEREO || mSensor==IMU_STEREO || mSensor==RGBD)
+    {
+        // for point cloud resolution
+        float resolution = fsSettings["PointCloudMapping.Resolution"];
+        float meank = fsSettings["meank"];
+        float thresh = fsSettings["thresh"];
+
+        mpPointCloudMapping = new PointCloudMapping(resolution, meank, thresh);
+        mpLocalMapper->SetPointCloudMapper(mpPointCloudMapping);
+        mpLoopCloser->SetPointCloudMapper(mpPointCloudMapping);
+        mpTracker->SetPointCloudMapper(mpPointCloudMapping);
+    }
 
     //usleep(10*1000*1000);
 
@@ -514,6 +527,7 @@ void System::ResetActiveMap()
 
 void System::Shutdown()
 {
+    mpPointCloudMapping->save();
     {
         unique_lock<mutex> lock(mMutexReset);
         mbShutDown = true;
