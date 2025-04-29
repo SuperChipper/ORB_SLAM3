@@ -86,7 +86,9 @@ int main(int argc, char **argv) {
 
     // 创建结果目录
     string results_dir = "results";
-    system(("mkdir -p " + results_dir).c_str());
+    if (system(("mkdir -p " + results_dir).c_str()) != 0) {
+        cerr << "无法创建结果目录: " << results_dir << endl;
+    }
     
     // 获取当前时间作为会话ID
     auto now = chrono::system_clock::now();
@@ -116,10 +118,10 @@ int main(int argc, char **argv) {
     colorCam->setInterleaved(false);
     colorCam->setColorOrder(dai::ColorCameraProperties::ColorOrder::BGR);
 
-    leftCam->setResolution(dai::MonoCameraProperties::SensorResolution::THE_400_P);
-    leftCam->setBoardSocket(dai::CameraBoardSocket::LEFT);
-    rightCam->setResolution(dai::MonoCameraProperties::SensorResolution::THE_400_P);
-    rightCam->setBoardSocket(dai::CameraBoardSocket::RIGHT);
+    leftCam->setResolution(dai::MonoCameraProperties::SensorResolution::THE_800_P);
+    leftCam->setBoardSocket(dai::CameraBoardSocket::CAM_B);
+    rightCam->setResolution(dai::MonoCameraProperties::SensorResolution::THE_800_P);
+    rightCam->setBoardSocket(dai::CameraBoardSocket::CAM_C);
 
     // Create outputs
     auto xoutColor = pipeline.create<dai::node::XLinkOut>();
@@ -149,7 +151,6 @@ int main(int argc, char **argv) {
 
     cv::Mat imCV, depthCV;
     double timestamp_image = -1.0;
-    bool image_ready = false;
     
     // 用于计算平均跟踪时间
     double total_tracking_time = 0.0;
@@ -168,8 +169,8 @@ int main(int argc, char **argv) {
         }
 
         // Convert to OpenCV format
-        imCV = cv::Mat(colorFrame->getHeight(), colorFrame->getWidth(), CV_8UC3, colorFrame->getData());
-        depthCV = cv::Mat(depthFrame->getHeight(), depthFrame->getWidth(), CV_16UC1, depthFrame->getData());
+        imCV = cv::Mat(colorFrame->getHeight(), colorFrame->getWidth(), CV_8UC3, (void*)colorFrame->getData().data(), cv::Mat::AUTO_STEP);
+        depthCV = cv::Mat(depthFrame->getHeight(), depthFrame->getWidth(), CV_16UC1, (void*)depthFrame->getData().data(), cv::Mat::AUTO_STEP);
 
         // Resize color image to match depth resolution
         cv::Mat imCV_resized;
@@ -178,14 +179,15 @@ int main(int argc, char **argv) {
         // Convert BGR to RGB
         cv::cvtColor(imCV_resized, imCV_resized, cv::COLOR_BGR2RGB);
 
-        // Get timestamp
-        timestamp_image = colorFrame->getTimestamp().get() * 1e-3;
+        // Get timestamp - 修复时间戳获取方式
+        timestamp_image = static_cast<double>(colorFrame->getTimestamp().time_since_epoch().count()) * 1e-9;
 
         // 记录跟踪开始时间
         chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
         
         // Process image
-        int tracking_state = SLAM.TrackRGBD(imCV_resized, depthCV, timestamp_image);
+        SLAM.TrackRGBD(imCV_resized, depthCV, timestamp_image);
+        int tracking_state = SLAM.GetTrackingState();
         
         // 计算跟踪时间
         chrono::steady_clock::time_point t2 = chrono::steady_clock::now();
