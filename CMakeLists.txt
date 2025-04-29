@@ -42,6 +42,8 @@ find_package(Eigen3 3.4.0 REQUIRED)
 find_package(Pangolin REQUIRED)
 find_package(realsense2)
 find_package(PCL 1.12 REQUIRED)
+set(depthai_DIR "/home/chip/depthai-core/build/install/lib/cmake/depthai")
+find_package(depthai REQUIRED)
 
 include_directories(
 ${PROJECT_SOURCE_DIR}
@@ -51,6 +53,7 @@ ${PROJECT_SOURCE_DIR}/Thirdparty/Sophus
 ${EIGEN3_INCLUDE_DIR}
 ${Pangolin_INCLUDE_DIRS}
 ${PCL_INCLUDE_DIRS}
+${depthai_INCLUDE_DIRS}
 /usr/include/vtk-9.1
 )
 
@@ -155,6 +158,12 @@ if(realsense2_FOUND)
     add_executable(rgbd_realsense_D435i
             Examples/RGB-D/rgbd_realsense_D435i.cc)
     target_link_libraries(rgbd_realsense_D435i ${PROJECT_NAME})
+endif()
+
+if(depthai_FOUND)
+    add_executable(rgbd_oakd_pro
+            Examples/RGB-D/rgbd_oakd_pro.cc)
+    target_link_libraries(rgbd_oakd_pro ${PROJECT_NAME} ${depthai_LIBRARIES})
 endif()
 
 

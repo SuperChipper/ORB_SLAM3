@@ -100,4 +100,4 @@ dataset*
 slam_eval_results.txt
 *.log
 *.pcd
-run/*
+runs/*
