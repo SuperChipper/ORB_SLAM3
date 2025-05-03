@@ -1,0 +1,91 @@
+%YAML:1.0
+
+#--------------------------------------------------------------------------------------------
+# Camera Parameters. Adjust them!
+#--------------------------------------------------------------------------------------------
+File.version: "1.0"
+
+Camera.type: "PinHole"
+
+# Camera calibration and distortion parameters (OpenCV)
+# 根据OAK-D Pro相机校准数据，适配720P分辨率
+Camera1.fx: 599.478516  # 左摄像头fx (为720P调整)
+Camera1.fy: 599.478516  # 左摄像头fy (为720P调整)
+Camera1.cx: 641.86907958 * 0.75  # 左摄像头cx (为720P调整)
+Camera1.cy: 424.88842772 * 0.75  # 左摄像头cy (为720P调整)
+
+# 左摄像头畸变系数
+Camera1.k1: 13.721192359924316
+Camera1.k2: -10.136673927307129
+Camera1.p1: -0.0006431257934309542
+Camera1.p2: -0.00022545314277522266
+Camera1.k3: -13.942343711853027
+
+Camera.width: 1280  # 相机宽度
+Camera.height: 720  # 相机高度 - 修改为720P
+
+# Camera frames per second
+Camera.fps: 30
+
+# Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
+Camera.RGB: 1
+
+# Close/Far threshold. Baseline times.
+Stereo.ThDepth: 40.0
+Stereo.b: 0.075  # 基线距离（米）
+
+# Depth map values factor - OAK-D Pro的深度图是毫米单位，需要转换为米
+RGBD.DepthMapFactor: 1000.0
+
+# Stereo transformation matrix (from left to right camera)
+# 从校准数据中获取
+Stereo.T_c1_c2: !!opencv-matrix
+  rows: 4
+  cols: 4
+  dt: f
+  data: [9.99588072e-01, 7.97877181e-03, -2.75679696e-02, -7.50475693e+00,
+        -7.88126234e-03, 9.99962330e-01, 3.64391902e-03, -2.22326852e-02,
+         2.75960043e-02, -3.42514785e-03, 9.99613285e-01, -6.96435496e-02,
+         0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 1.00000000e+00]
+
+#--------------------------------------------------------------------------------------------
+# ORB Parameters
+#--------------------------------------------------------------------------------------------
+
+# ORB Extractor: Number of features per image
+ORBextractor.nFeatures: 1200
+
+# ORB Extractor: Scale factor between levels in the scale pyramid
+ORBextractor.scaleFactor: 1.2
+
+# ORB Extractor: Number of levels in the scale pyramid
+ORBextractor.nLevels: 8
+
+# ORB Extractor: Fast threshold
+# Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
+# Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
+# You can lower these values if your images have low contrast
+ORBextractor.iniThFAST: 20
+ORBextractor.minThFAST: 7
+
+#--------------------------------------------------------------------------------------------
+# Viewer Parameters
+#--------------------------------------------------------------------------------------------
+Viewer.KeyFrameSize: 0.05
+Viewer.KeyFrameLineWidth: 1.0
+Viewer.GraphLineWidth: 0.9
+Viewer.PointSize: 2.0
+Viewer.CameraSize: 0.08
+Viewer.CameraLineWidth: 3.0
+Viewer.ViewpointX: 0.0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -1.8
+Viewer.ViewpointF: 500.0
+Viewer.imageViewScale: 1.0
+
+# 点云生成参数
+PointCloud.Resolution: 0.05  # VoxelGrid降采样分辨率(米)，增大以避免溢出问题
+PointCloud.FilterMeanK: 50  # 统计滤波器的k值
+PointCloud.FilterThresh: 1.0  # 统计滤波器阈值
+PointCloud.DepthMin: 0.1  # 最小有效深度(米)
+PointCloud.DepthMax: 5.0  # 最大有效深度(米)

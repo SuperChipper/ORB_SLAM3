@@ -226,9 +226,9 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     if(mSensor==STEREO || mSensor==IMU_STEREO || mSensor==RGBD)
     {
         // for point cloud resolution
-        float resolution = fsSettings["PointCloudMapping.Resolution"];
-        float meank = fsSettings["meank"];
-        float thresh = fsSettings["thresh"];
+        float resolution = 0.05; //fsSettings["PointCloudMapping.Resolution"];
+        float meank = 50; //fsSettings["meank"];
+        float thresh = 1.0; //fsSettings["thresh"];
 
         mpPointCloudMapping = new PointCloudMapping(resolution, meank, thresh);
         mpLocalMapper->SetPointCloudMapper(mpPointCloudMapping);
@@ -527,7 +527,7 @@ void System::ResetActiveMap()
 
 void System::Shutdown()
 {
-    mpPointCloudMapping->save();
+    // mpPointCloudMapping->save();
     {
         unique_lock<mutex> lock(mMutexReset);
         mbShutDown = true;
@@ -563,6 +563,9 @@ void System::Shutdown()
     {
         Verbose::PrintMess("Atlas saving to file " + mStrSaveAtlasToFile, Verbose::VERBOSITY_NORMAL);
         SaveAtlas(FileType::BINARY_FILE);
+    }
+    if(mpPointCloudMapping){
+        mpPointCloudMapping->shutdown();
     }
 
     /*if(mpViewer)

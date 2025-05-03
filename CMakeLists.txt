@@ -6,7 +6,9 @@ IF(NOT CMAKE_BUILD_TYPE)
 ENDIF()
 
 MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
-
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
@@ -53,7 +55,6 @@ ${PROJECT_SOURCE_DIR}/Thirdparty/Sophus
 ${EIGEN3_INCLUDE_DIR}
 ${Pangolin_INCLUDE_DIRS}
 ${PCL_INCLUDE_DIRS}
-/usr/include/vtk-9.1
 )
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
@@ -162,7 +163,8 @@ endif()
 if(depthai_FOUND)
     add_executable(rgbd_oakd_pro
             Examples/RGB-D/rgbd_oakd_pro.cc)
-    target_link_libraries(rgbd_oakd_pro ${PROJECT_NAME} depthai::opencv)
+    target_link_libraries(rgbd_oakd_pro ${PROJECT_NAME})
+    target_link_libraries(rgbd_oakd_pro PRIVATE depthai::opencv)
 endif()
 
 

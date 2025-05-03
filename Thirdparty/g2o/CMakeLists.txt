@@ -5,7 +5,7 @@ PROJECT(g2o)
 
 SET(g2o_C_FLAGS)
 SET(g2o_CXX_FLAGS)
-
+set(CMAKE_CXX_STANDARD 14)
 # default built type
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
